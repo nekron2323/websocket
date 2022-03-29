@@ -33,6 +33,5 @@ async def websocket_endpoint(websocket: WebSocket):
                 manager.message_count += 1
                 manager.messages[manager.message_count] = data['text']
                 await websocket.send_json(data)
-            print(manager.messages)
     except WebSocketDisconnect:
         pass
