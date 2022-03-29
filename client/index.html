@@ -30,7 +30,6 @@
             var messages = document.getElementById("messages");
             var message = document.createElement("li")
             var content = document.createTextNode(response.text)
-            console.log(JSON.parse(event.data))
             message.appendChild(content)
             messages.appendChild(message)
         };
