@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Отправка сообщений</title>
+</head>
+
+<body>
+    <form action="" onsubmit="return sendMessage(event);">
+        <input type="text" id="messageText" autocomplete="off" />
+        <input type="submit" value="Отправить" />
+    </form>
+    <ol id="messages">
+
+    </ol>
+    <script>
+        var ws = new WebSocket("ws://localhost:8000/ws");
+
+        function sendMessage(event) {
+            var inputText = document.getElementById("messageText");
+            ws.send(JSON.stringify({
+                text: inputText.value
+            }));
+            inputText.value = "";
+            return false;
+        };
+        ws.onmessage = function(event) {
+            response = JSON.parse(event.data)
+            var messages = document.getElementById("messages");
+            var message = document.createElement("li")
+            var content = document.createTextNode(response.text)
+            console.log(JSON.parse(event.data))
+            message.appendChild(content)
+            messages.appendChild(message)
+        };
+    </script>
+</body>
+
+</html>
