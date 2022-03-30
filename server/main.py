@@ -5,17 +5,16 @@ app = FastAPI()
 CLIENT_FOLDER = '../client'
 HTML_FILE = '/index.html'
 
+client_messages = {}
 
-class ConnectionManager:
+class Messages:
     def __init__(self):
-        self.message_count = 0
         self.messages = {}
+        self.messages_count = 0
 
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-
-
-manager = ConnectionManager()
+    def add_message(self, message):
+        self.messages_count += 1
+        self.messages[self.messages_count] = message
 
 
 @app.get('/')
@@ -25,13 +24,13 @@ async def get():
 
 @app.websocket('/ws')
 async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
+    await websocket.accept()
+    messages = Messages()
     try:
         while True:
             data = await websocket.receive_json()
             if data['text']:
-                manager.message_count += 1
-                manager.messages[manager.message_count] = data['text']
+                messages.add_message(data['text'])
                 await websocket.send_json(data)
     except WebSocketDisconnect:
-        pass
+        client_messages[websocket] = messages.messages
