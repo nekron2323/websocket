@@ -7,15 +7,6 @@ HTML_FILE = '/index.html'
 
 client_messages = {}
 
-class Messages:
-    def __init__(self):
-        self.messages = {}
-        self.messages_count = 0
-
-    def add_message(self, message):
-        self.messages_count += 1
-        self.messages[self.messages_count] = message
-
 
 @app.get('/')
 async def get():
@@ -25,12 +16,14 @@ async def get():
 @app.websocket('/ws')
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    messages = Messages()
+    messages = {}
+    messages_count = 0
     try:
         while True:
             data = await websocket.receive_json()
             if data['text']:
-                messages.add_message(data['text'])
+                messages_count += 1
+                messages[messages_count] = data['text']
                 await websocket.send_json(data)
     except WebSocketDisconnect:
-        client_messages[websocket] = messages.messages
+        client_messages[websocket] = messages
